@@ -1,0 +1,114 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.db
+*.sqlite3
+*.sqlite
+*.swp
+*.swo
+*.bak
+
+# Django migrations
+*/migrations/
+!*/migrations/__init__.py
+
+# Media and static files
+/media
+/staticfiles
+/static
+/assets
+
+# VS Code
+.vscode/
+
+# PyCharm
+.idea/
+*.iml
+
+# Environment variables
+.env
+.env.*
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+.ENV/
+.envrc
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Test output
+test-results/
+junit-*.xml
+
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pytest
+.pytest_cache/
+
+# Build
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Sphinx documentation
+docs/_build/
+
+# Node
+node_modules/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor backups
+*~
+*.orig
+*.bak
+*.tmp
+
+# Local settings
+local_settings.py
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# Gunicorn
+gunicorn.pid
+
+# Redis dump
+dump.rdb
