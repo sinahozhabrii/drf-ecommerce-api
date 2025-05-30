@@ -70,7 +70,7 @@ class AttributeValue(models.Model):
         return f'{self.attribute}-{self.value}'
     
 class ProductVariant(models.Model):
-    product = models.ForeignKey(Product,models.PROTECT)
+    product = models.ForeignKey(Product,models.PROTECT,related_name='variants')
     attribute = models.ManyToManyField(AttributeValue)
     inventory = models.PositiveSmallIntegerField(default=0)
     price = models.DecimalField(max_digits=10,decimal_places=2)
