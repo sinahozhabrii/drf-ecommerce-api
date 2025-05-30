@@ -25,6 +25,9 @@ class Product(models.Model):
     datetime_created = models.DateTimeField(auto_now_add=True)
     datetime_modified = models.DateTimeField(auto_now=True)
     
+    def __str__(self):
+        return self.title
+    
 class comments(models.Model):
     COMMENT_STATUS_WAITING = 'w'
     COMMENT_STATUS_APPROVED = 'a'
@@ -42,17 +45,29 @@ class comments(models.Model):
 class Category(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(null=True,blank=True)
+    
+    def __str__(self):
+        return self.title
 
 class Discount(models.Model):
     amount = models.FloatField()
     description = models.CharField(max_length=255)
+    
+    def __str__(self):
+        return str(self.amount)
 
 class Attribute(models.Model):
     title = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return self.title
 
 class AttributeValue(models.Model):
     attribute = models.ForeignKey(Attribute,on_delete=models.CASCADE)
     value = models.CharField(max_length=100)
+    
+    def __str__(self):
+        return f'{self.attribute}-{self.value}'
     
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product,models.PROTECT)
@@ -60,6 +75,10 @@ class ProductVariant(models.Model):
     inventory = models.PositiveSmallIntegerField(default=0)
     price = models.DecimalField(max_digits=10,decimal_places=2)
     discount = models.ManyToManyField(Discount)
+    
+    def __str__(self):
+        attributes = ", ".join([str(attr) for attr in self.attribute.all()])
+        return f"{self.product} - {attributes}"
 
 class Cart(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4,unique=True,editable=False)
