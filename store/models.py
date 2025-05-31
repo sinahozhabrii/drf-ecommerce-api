@@ -82,6 +82,9 @@ class ProductVariant(models.Model):
 
 class Cart(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4,unique=True,editable=False)
+    
+    def __str__(self):
+        return str(self.uuid)
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart,on_delete=models.CASCADE)
