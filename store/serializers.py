@@ -30,3 +30,30 @@ class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Cart
         fields = ['uuid']
+        
+class CartItemCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CartItem
+        fields = ['cart','product_variant','quantity',]
+    
+    def create(self, validated_data):
+        try:
+            cart = validated_data['cart']
+            product_variant = validated_data['product_variant']
+            obj = models.CartItem.objects.get(cart=cart,product_variant=product_variant)
+            if obj:
+                obj.quantity += validated_data['quantity']
+                obj.save()
+                return obj
+        except:
+            
+            return super().create(validated_data)
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product_variant = ProductVariantSerializer()
+    title = serializers.CharField(source='product_variant.product.title')
+    cart = serializers.UUIDField(source='cart.uuid')
+    
+    class Meta:
+        model = models.CartItem
+        fields = ['cart','title','product_variant','quantity','total_price']

@@ -94,9 +94,6 @@ class CartItem(models.Model):
     @property
     def total_price(self):
         return self.quantity * self.product_variant.price
-    
-    class Meta:
-        unique_together = ('cart', 'product_variant')
 
 class Order(models.Model):
     CHOICES = [
