@@ -40,3 +40,6 @@ class CartDetialView(mixins.ListModelMixin,generics.GenericAPIView):
         uuid = self.kwargs.get('uuid')
         return super().get_queryset().filter(cart__uuid=uuid).select_related('cart','product_variant__product').prefetch_related('product_variant__attribute__attribute','product_variant__discount')
 
+class CartItemDeleteView(generics.DestroyAPIView):
+    queryset = models.CartItem.objects.all()
+    serializer_class = serializers.CartItemSerializer
