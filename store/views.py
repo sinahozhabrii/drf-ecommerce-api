@@ -43,3 +43,17 @@ class CartDetialView(mixins.ListModelMixin,generics.GenericAPIView):
 class CartItemDeleteView(generics.DestroyAPIView):
     queryset = models.CartItem.objects.all()
     serializer_class = serializers.CartItemSerializer
+    
+class OrderCreateListView(generics.ListCreateAPIView):
+    queryset = models.Order.objects.all()
+    
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return serializers.OrderSrializer
+        elif self.request.method == "POST":
+            return serializers.OrderCreateSerializer
+        
+    def get_serializer_context(self):
+        context =  super().get_serializer_context()
+        context['user_id'] = self.request.user.id
+        return context

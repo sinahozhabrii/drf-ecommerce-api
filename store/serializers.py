@@ -1,3 +1,5 @@
+import uuid
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from django.utils.text import slugify
 from . import models
@@ -57,3 +59,40 @@ class CartItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CartItem
         fields = ['cart','title','product_variant','quantity','total_price']
+        
+class OrderSrializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = models.Order
+        fields = ["__all__"]
+        read_only_fields = ['status','datetime_create','datetime_modified','is_paid']
+        
+class OrderCreateSerializer(serializers.ModelSerializer):
+    uuid = serializers.UUIDField(write_only=True)
+    
+    class Meta:
+        model = models.Order
+        fields = ['uuid','first_name','last_name','phone_number','province','city','address','email']
+        read_only_fields = ['status','datetime_create','datetime_modified','is_paid']
+    
+    def create(self, validated_data,):
+        uuid = validated_data.get('uuid')
+        cart_obj = get_object_or_404(models.Cart,uuid=uuid)
+        user_id = self.context.get('user_id')
+        customer = get_object_or_404(models.Customer,user=user_id)
+        validated_data.pop('uuid')
+        order = models.Order.objects.create(customer=customer,**validated_data)
+        cartitems_objs = cart_obj.items.all()
+        orderitems_list = []
+        for item in cartitems_objs:
+            orderitem = models.OrderItem()
+            
+            orderitem.order = order
+            orderitem.product_variant = item.product_variant
+            orderitem.quantity = item.quantity
+            orderitems_list.append(orderitem)
+        
+        models.OrderItem.objects.bulk_create(orderitems_list)
+        cart_obj.delete()
+        
+        return order

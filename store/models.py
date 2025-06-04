@@ -87,7 +87,7 @@ class Cart(models.Model):
         return str(self.uuid)
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart,on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name='items')
     product_variant = models.ForeignKey(ProductVariant,on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField(default=1)
     
@@ -123,3 +123,4 @@ class OrderItem(models.Model):
     
     class Meta:
         unique_together = ['order','product_variant']
+        
