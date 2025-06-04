@@ -117,9 +117,14 @@ class Order(models.Model):
     datetime_modified = models.DateField(auto_now=True)
 
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order,on_delete=models.CASCADE)
+    order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name='items')
     product_variant = models.ForeignKey(ProductVariant,on_delete=models.PROTECT)
     quantity = models.PositiveSmallIntegerField(default=1)
+    unit_price = models.DecimalField(max_digits=10,decimal_places=2)
+    
+    @property
+    def items_total_price(self):
+        return self.quantity * self.unit_price
     
     class Meta:
         unique_together = ['order','product_variant']

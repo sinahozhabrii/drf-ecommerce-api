@@ -52,6 +52,8 @@ class OrderCreateListView(generics.ListCreateAPIView):
             return serializers.OrderSrializer
         elif self.request.method == "POST":
             return serializers.OrderCreateSerializer
+    def get_queryset(self):
+        return super().get_queryset().select_related('customer__user')
         
     def get_serializer_context(self):
         context =  super().get_serializer_context()

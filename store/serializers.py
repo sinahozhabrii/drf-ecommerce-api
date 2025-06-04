@@ -1,3 +1,4 @@
+from pickle import TRUE
 import uuid
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
@@ -60,12 +61,20 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = models.CartItem
         fields = ['cart','title','product_variant','quantity','total_price']
         
+class OrderItemSerializer(serializers.ModelSerializer):
+    product_variant = ProductVariantSerializer()
+    product_title = serializers.CharField(source='product_variant.product.title')
+    class Meta:
+        model = models.OrderItem
+        fields = ['product_title','product_variant','quantity','unit_price','items_total_price']
+        
 class OrderSrializer(serializers.ModelSerializer):
-    
+    customer = serializers.CharField(source='customer.user.username')
+    items = OrderItemSerializer(many=TRUE)
     class Meta:
         model = models.Order
-        fields = ["__all__"]
-        read_only_fields = ['status','datetime_create','datetime_modified','is_paid']
+        fields = ['customer','first_name','last_name','phone_number','province','city','address','email','status','items','datetime_created','datetime_modified','is_paid']
+        read_only_fields = ['status','datetime_created','datetime_modified','is_paid']
         
 class OrderCreateSerializer(serializers.ModelSerializer):
     uuid = serializers.UUIDField(write_only=True)
@@ -73,7 +82,7 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Order
         fields = ['uuid','first_name','last_name','phone_number','province','city','address','email']
-        read_only_fields = ['status','datetime_create','datetime_modified','is_paid']
+        read_only_fields = ['status','datetime_created','datetime_modified','is_paid']
     
     def create(self, validated_data,):
         uuid = validated_data.get('uuid')
@@ -90,9 +99,11 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             orderitem.order = order
             orderitem.product_variant = item.product_variant
             orderitem.quantity = item.quantity
+            orderitem.unit_price = item.product_variant.price
             orderitems_list.append(orderitem)
         
         models.OrderItem.objects.bulk_create(orderitems_list)
         cart_obj.delete()
         
         return order
+    
