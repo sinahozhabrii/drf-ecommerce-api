@@ -1,9 +1,10 @@
 import re
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from rest_framework import generics , mixins
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
+from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated,BasePermission,DjangoModelPermissions
 from . import models
 from . import serializers
@@ -105,3 +106,11 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
         if self.request.user.is_staff and self.request.user.has_perm('store.change_order'):
             return serializers.AdminOrderSrializer
         return serializers.OrderSrializer
+    
+class CartItemIncrementView(APIView):
+            
+    def get(self,*args, **kwargs):
+        obj = get_object_or_404(models.CartItem,pk=kwargs.get('pk'),cart__uuid=kwargs.get('uuid'))
+        obj.quantity +=1
+        obj.save()
+        return Response({'quantity': obj.quantity}, status=status.HTTP_200_OK)
