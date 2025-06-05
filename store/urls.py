@@ -17,7 +17,7 @@ urlpatterns = [
     
     path('cart/<uuid:uuid>/item/<int:pk>/increment/', views.CartItemIncrementView.as_view(), name='cartitem-increment'),
     
-    # path('cart/<uuid:uuid>/item/<int:pk>/decrement/', views.CartItemDecrementView.as_view(), name='cartitem-decrement'),
+    path('cart/<uuid:uuid>/item/<int:pk>/decrement/', views.CartItemDecrementView.as_view(), name='cartitem-decrement'),
 
     path('cart/<uuid:uuid>/items/',views.CartDetialView.as_view(),name='cart-detial'),
     

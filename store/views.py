@@ -114,3 +114,14 @@ class CartItemIncrementView(APIView):
         obj.quantity +=1
         obj.save()
         return Response({'quantity': obj.quantity}, status=status.HTTP_200_OK)
+    
+class CartItemDecrementView(APIView):
+            
+    def get(self,*args, **kwargs):
+        obj = get_object_or_404(models.CartItem,pk=kwargs.get('pk'),cart__uuid=kwargs.get('uuid'))
+        if obj.quantity>1:
+            obj.quantity -=1
+            obj.save()
+        else:
+            obj.delete()
+        return Response({'quantity': obj.quantity}, status=status.HTTP_200_OK)
