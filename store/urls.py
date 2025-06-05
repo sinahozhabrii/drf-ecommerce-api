@@ -11,7 +11,7 @@ urlpatterns = [
     
     path('cartitem/create/',views.CartItemCreateView.as_view(),name='cartitem-create'),
     
-    path('cartitem/<int:pk>/delete/',views.CartItemDeleteView.as_view(),name='cartitem-delete'),
+    path('cart/<uuid:uuid>/item/<int:pk>/delete/',views.CartItemDeleteView.as_view(),name='cartitem-delete'),
     
     path('cart/<uuid:uuid>/items/',views.CartDetialView.as_view(),name='cart-detial'),
     
