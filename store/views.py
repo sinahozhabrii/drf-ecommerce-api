@@ -62,6 +62,19 @@ class CartItemDeleteView(generics.DestroyAPIView):
             raise PermissionDenied("You do not have permission to delete this item.")
     
         return item
+    
+class CartItemUpdateView(generics.UpdateAPIView):
+    queryset = models.CartItem.objects.select_related('cart')
+    serializer_class = serializers.CartItemUpdateSerializer
+    def get_object(self):
+        cart_uuid = self.kwargs.get('uuid')
+        item = super().get_object()
+
+        if str(item.cart.uuid) != str(cart_uuid):
+            raise PermissionDenied("You do not have permission to delete this item.")
+    
+        return item
+    
 
     
 class OrderCreateListView(generics.ListCreateAPIView):

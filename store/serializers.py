@@ -61,6 +61,11 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = models.CartItem
         fields = ['cart','title','product_variant','quantity','total_price']
         
+class CartItemUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CartItem
+        fields = ['quantity']
+        
 class OrderItemSerializer(serializers.ModelSerializer):
     product_variant = ProductVariantSerializer()
     product_title = serializers.CharField(source='product_variant.product.title')

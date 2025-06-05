@@ -13,6 +13,8 @@ urlpatterns = [
     
     path('cart/<uuid:uuid>/item/<int:pk>/delete/',views.CartItemDeleteView.as_view(),name='cartitem-delete'),
     
+    path('cart/<uuid:uuid>/item/<int:pk>/update/',views.CartItemUpdateView.as_view(),name='cartitem-update'),
+    
     path('cart/<uuid:uuid>/items/',views.CartDetialView.as_view(),name='cart-detial'),
     
     path('order/create/',views.OrderCreateListView.as_view(),name='order-list'),
