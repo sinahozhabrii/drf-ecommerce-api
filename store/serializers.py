@@ -74,7 +74,18 @@ class OrderSrializer(serializers.ModelSerializer):
     class Meta:
         model = models.Order
         fields = ['customer','first_name','last_name','phone_number','province','city','address','email','status','items','datetime_created','datetime_modified','is_paid']
-        read_only_fields = ['status','datetime_created','datetime_modified','is_paid']
+        read_only_fields = ['status','datetime_created','datetime_modified','is_paid','items']
+        
+class AdminOrderSrializer(serializers.ModelSerializer):
+    customer = serializers.CharField(source='customer.user.username')
+    items = OrderItemSerializer(many=TRUE)
+    class Meta:
+        model = models.Order
+        fields = ['customer','first_name','last_name','phone_number','province','city','address','email','status','items','datetime_created','datetime_modified','is_paid']      
+        
+        
+        
+        
         
 class OrderCreateSerializer(serializers.ModelSerializer):
     uuid = serializers.UUIDField(write_only=True)

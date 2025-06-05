@@ -16,4 +16,6 @@ urlpatterns = [
     path('cart/<uuid:uuid>/items/',views.CartDetialView.as_view(),name='cart-detial'),
     
     path('order/create/',views.OrderCreateListView.as_view(),name='order-list'),
+    
+    path('order/<int:pk>/',views.OrderDetailView.as_view(),name='order-detail')
 ]

@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics , mixins
+from rest_framework.response import Response
+from rest_framework import status
 from . import models
 from . import serializers
 # Create your views here.
@@ -28,13 +30,18 @@ class CartItemCreateView(generics.CreateAPIView):
     def get_queryset(self):
         return models.CartItem.objects.all().select_related('product_variant__product',).prefetch_related('product_variant__attribute__attribute','product_variant__discount')
         
-class CartDetialView(mixins.ListModelMixin,generics.GenericAPIView):
+class CartDetialView(mixins.ListModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
     queryset = models.CartItem.objects.all()
     serializer_class = serializers.CartItemSerializer
     lookup_field = 'uuid'
     
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
+    
+    def delete(self, request, *args, **kwargs):
+        models.CartItem.objects.filter(cart__uuid=kwargs['uuid']).delete()
+        
+        return Response({'detail':'cart is empty'},status=status.HTTP_204_NO_CONTENT)
     
     def get_queryset(self):
         uuid = self.kwargs.get('uuid')
@@ -53,9 +60,16 @@ class OrderCreateListView(generics.ListCreateAPIView):
         elif self.request.method == "POST":
             return serializers.OrderCreateSerializer
     def get_queryset(self):
-        return super().get_queryset().select_related('customer__user')
+        return super().get_queryset().select_related('customer__user').filter(customer__user=self.request.user)
         
     def get_serializer_context(self):
         context =  super().get_serializer_context()
         context['user_id'] = self.request.user.id
         return context
+    
+    
+class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = models.Order.objects.all()
+    serializer_class = serializers.AdminOrderSrializer
+    def get_queryset(self):
+        return super().get_queryset().select_related('customer__user').filter(customer__user=self.request.user)
