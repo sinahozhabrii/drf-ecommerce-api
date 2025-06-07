@@ -6,12 +6,15 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated,BasePermission,DjangoModelPermissions
+from . import pagination
 from . import models
 from . import serializers
 # Create your views here.
 class ProductListCreateView(generics.ListCreateAPIView):
     queryset = models.Product.objects.all()
     serializer_class = serializers.ProductSerializer
+    pagination_class = pagination.CustomPagination
+    permission_classes = [DjangoModelPermissions]
     
     def get_queryset(self):
         return super().get_queryset().prefetch_related('variants__attribute__attribute','variants__discount').select_related('category')
@@ -20,6 +23,7 @@ class ProductDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Product.objects.all()
     serializer_class = serializers.ProductSerializer
     permission_classes = [DjangoModelPermissions]
+    
     
     def get_queryset(self):
         return super().get_queryset().prefetch_related('variants__attribute__attribute','variants__discount').select_related('category')
@@ -98,7 +102,7 @@ class OrderCreateListView(generics.ListCreateAPIView):
 class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     
     queryset = models.Order.objects.all()
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated,DjangoModelPermissions]
     def get_queryset(self):
         return super().get_queryset().select_related('customer__user').filter(customer__user=self.request.user)
     
@@ -109,7 +113,7 @@ class OrderDetailView(generics.RetrieveUpdateDestroyAPIView):
     
 class CartItemIncrementView(APIView):
             
-    def get(self,*args, **kwargs):
+    def patch(self,*args, **kwargs):
         obj = get_object_or_404(models.CartItem,pk=kwargs.get('pk'),cart__uuid=kwargs.get('uuid'))
         obj.quantity +=1
         obj.save()
@@ -117,7 +121,7 @@ class CartItemIncrementView(APIView):
     
 class CartItemDecrementView(APIView):
             
-    def get(self,*args, **kwargs):
+    def patch(self,*args, **kwargs):
         obj = get_object_or_404(models.CartItem,pk=kwargs.get('pk'),cart__uuid=kwargs.get('uuid'))
         if obj.quantity>1:
             obj.quantity -=1
