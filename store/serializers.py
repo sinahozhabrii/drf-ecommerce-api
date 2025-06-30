@@ -123,3 +123,12 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         
         return order
     
+    
+class CustomerSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source = 'user.username')
+    email = serializers.EmailField(source = 'user.email')
+    class Meta:
+        model = models.Customer
+        fields = ['username','email','phone_number','age']
+        
+    

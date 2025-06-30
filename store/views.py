@@ -129,3 +129,18 @@ class CartItemDecrementView(APIView):
         else:
             obj.delete()
         return Response({'quantity': obj.quantity}, status=status.HTTP_200_OK)
+    
+    
+class CustomerView(mixins.UpdateModelMixin,mixins.DestroyModelMixin,mixins.ListModelMixin,generics.GenericAPIView):
+    queryset = models.Customer.objects.all()
+    serializer_class = serializers.CustomerSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+    def patch(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+    
+    def get_queryset(self):
+        return models.Customer.objects.filter(user=self.request.user)
