@@ -27,6 +27,18 @@ class ProductDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     
     def get_queryset(self):
         return super().get_queryset().prefetch_related('variants__attribute__attribute','variants__discount').select_related('category')
+    
+class CategorysList(generics.ListAPIView):
+    queryset = models.Category.objects.all()
+    serializer_class = serializers.CategorySerializer
+    
+class CategoryDetail(generics.RetrieveAPIView):
+    queryset = models.Category.objects.all()
+    serializer_class = serializers.categoryDetailSerializer
+    lookup_field = 'slug'
+    
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related('products')
 
 class CartCreateView(generics.CreateAPIView):
     queryset = models.Cart.objects.all()

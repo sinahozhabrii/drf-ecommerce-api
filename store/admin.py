@@ -8,7 +8,6 @@ admin.site.register(models.Address)
 admin.site.register(models.Attribute)
 admin.site.register(models.AttributeValue)
 admin.site.register(models.CartItem)
-admin.site.register(models.Category)
 admin.site.register(models.comments)
 admin.site.register(models.Order)
 admin.site.register(models.OrderItem)
@@ -37,3 +36,12 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(models.Cart)    
 class CartAdmin(admin.ModelAdmin):
     inlines = [CartItemInline]
+    
+@admin.register(models.Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['title','description','slug','product_num']
+    prepopulated_fields = {'slug':['title']}
+    
+    def product_num(self,category):
+        
+        return category.products.all().count()

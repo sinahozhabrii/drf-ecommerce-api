@@ -20,7 +20,7 @@ class Address(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=255)
     descrption = models.TextField(blank=False,null=True)
-    category = models.ForeignKey("Category", on_delete=models.SET_NULL,null=True)
+    category = models.ForeignKey("Category", on_delete=models.SET_NULL,null=True,related_name='products')
     slug = models.SlugField()
     datetime_created = models.DateTimeField(auto_now_add=True)
     datetime_modified = models.DateTimeField(auto_now=True)
@@ -44,6 +44,7 @@ class comments(models.Model):
     
 class Category(models.Model):
     title = models.CharField(max_length=255)
+    slug = models.SlugField()
     description = models.TextField(null=True,blank=True)
     
     def __str__(self):

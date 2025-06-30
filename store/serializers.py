@@ -29,6 +29,21 @@ class ProductSerializer(serializers.ModelSerializer):
         validated_data['slug'] = slug
         return super().create(validated_data)
     
+class CategorySerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name = 'category-detail',
+        lookup_field = 'slug'
+        
+    )
+    class Meta:
+        model = models.Category
+        fields = ['title','description','url']
+        
+class categoryDetailSerializer(serializers.ModelSerializer):
+    products = ProductSerializer(many=True)
+    class Meta:
+        model = models.Category
+        fields = ['title','description','products']
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Cart
