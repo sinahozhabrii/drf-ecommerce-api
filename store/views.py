@@ -1,32 +1,48 @@
 import re
 from django.shortcuts import get_object_or_404, render
-from rest_framework import generics , mixins
+from rest_framework import generics , mixins,filters
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated,BasePermission,DjangoModelPermissions
+from rest_framework.permissions import IsAuthenticated, BasePermission, DjangoModelPermissions, AllowAny
+from django_filters.rest_framework import DjangoFilterBackend
+from . import filter
 from . import pagination
 from . import models
 from . import serializers
 # Create your views here.
 class ProductListCreateView(generics.ListCreateAPIView):
     queryset = models.Product.objects.all()
-    serializer_class = serializers.ProductSerializer
+    serializer_class = serializers.ProductListSerializer
     pagination_class = pagination.CustomPagination
     permission_classes = [DjangoModelPermissions]
+    filter_backends = [DjangoFilterBackend,filters.SearchFilter,filters.OrderingFilter]
+    filterset_class = filter.ProductFilter
+    
+    search_fields = ['title', 'description']
+    ordering_fields = ['price', 'created_at']
     
     def get_queryset(self):
         return super().get_queryset().prefetch_related('variants__attribute__attribute','variants__discount').select_related('category')
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
 
+        return [DjangoModelPermissions()]
 class ProductDetailUpdateDeleteView(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Product.objects.all()
-    serializer_class = serializers.ProductSerializer
+    serializer_class = serializers.ProductDetailSerializer
     permission_classes = [DjangoModelPermissions]
     
     
     def get_queryset(self):
         return super().get_queryset().prefetch_related('variants__attribute__attribute','variants__discount').select_related('category')
+    
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [DjangoModelPermissions()]
     
 class CategorysList(generics.ListAPIView):
     queryset = models.Category.objects.all()
@@ -51,7 +67,7 @@ class CartItemCreateView(generics.CreateAPIView):
     def get_queryset(self):
         return models.CartItem.objects.all().select_related('product_variant__product',).prefetch_related('product_variant__attribute__attribute','product_variant__discount')
         
-class CartDetialView(mixins.ListModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
+class CartDetailView(mixins.ListModelMixin,mixins.DestroyModelMixin,generics.GenericAPIView):
     queryset = models.CartItem.objects.all()
     serializer_class = serializers.CartItemSerializer
     lookup_field = 'uuid'

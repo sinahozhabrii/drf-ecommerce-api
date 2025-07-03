@@ -11,6 +11,9 @@ class Customer(models.Model):
     def customer_address(self):
         return f"province: {self.address.province}\n-city: {self.address.city}\n-full_address: {self.address.address}"
     
+    def __str__(self):
+        return self.user.username
+    
 class Address(models.Model):
     customer = models.OneToOneField(Customer,on_delete=models.CASCADE,related_name='address')
     province = models.CharField(max_length=100)
@@ -19,7 +22,7 @@ class Address(models.Model):
     
 class Product(models.Model):
     title = models.CharField(max_length=255)
-    descrption = models.TextField(blank=False,null=True)
+    description = models.TextField(blank=False,null=True)
     category = models.ForeignKey("Category", on_delete=models.SET_NULL,null=True,related_name='products')
     slug = models.SlugField()
     datetime_created = models.DateTimeField(auto_now_add=True)

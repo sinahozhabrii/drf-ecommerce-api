@@ -14,13 +14,31 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         
     def get_attributes(self, obj):
         return [str(attr) for attr in obj.attribute.all()]
+
+class ProductCommentsSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='customer.user.username', read_only=True)
+    class Meta:
+        model = models.comments
+        fields = ['username','body']
         
-class ProductSerializer(serializers.ModelSerializer):
+        
+class ProductDetailSerializer(serializers.ModelSerializer):
     variants = ProductVariantSerializer(many=True)
     category_title = serializers.CharField(source='category.title', read_only=True)
+    comments_set = ProductCommentsSerializer(many=True)
     class Meta:
         model = models.Product
-        fields = ['id','title','descrption','category_title','slug','datetime_created','datetime_modified','variants']
+        fields = ['title','description','category_title','variants','comments_set']
+
+        
+
+    
+class ProductListSerializer(serializers.ModelSerializer):
+    category_title = serializers.CharField(source='category.title', read_only=True)
+    price = serializers.SerializerMethodField()
+    class Meta:
+        model = models.Product
+        fields = ['title','description','category_title','price']
         read_only_fields = ['slug']
         
     def create(self, validated_data):
@@ -28,6 +46,13 @@ class ProductSerializer(serializers.ModelSerializer):
         slug = slugify(title)
         validated_data['slug'] = slug
         return super().create(validated_data)
+    
+    def get_price(self,obj):
+        try:
+            return obj.variants.order_by('price').first().price
+        
+        except:
+            return 0
     
 class CategorySerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
@@ -40,7 +65,7 @@ class CategorySerializer(serializers.ModelSerializer):
         fields = ['title','description','url']
         
 class categoryDetailSerializer(serializers.ModelSerializer):
-    products = ProductSerializer(many=True)
+    products = ProductListSerializer(many=True)
     class Meta:
         model = models.Category
         fields = ['title','description','products']

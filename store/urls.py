@@ -9,7 +9,7 @@ urlpatterns = [
     
     path('products/<int:pk>/',views.ProductDetailUpdateDeleteView.as_view(),name='product-detail'),
     
-    path('products/categories/',views.CategorysList.as_view(),name='category-list'),
+    path('products/categories/',views.CategorysList.as_view(),name='categories-list'),
     
     path('product/category/<slug:slug>/',views.CategoryDetail.as_view(),name='category-detail'),
     
@@ -25,7 +25,7 @@ urlpatterns = [
     
     path('cart/<uuid:uuid>/item/<int:pk>/decrement/', views.CartItemDecrementView.as_view(), name='cartitem-decrement'),
 
-    path('cart/<uuid:uuid>/items/',views.CartDetialView.as_view(),name='cart-detial'),
+    path('cart/<uuid:uuid>/items/',views.CartDetailView.as_view(),name='cart-detail'),
     
     path('order/create/',views.OrderCreateListView.as_view(),name='order-list'),
     
