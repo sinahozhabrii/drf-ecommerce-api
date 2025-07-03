@@ -1,8 +1,10 @@
+from codecs import lookup
 from pickle import TRUE
 import uuid
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from django.utils.text import slugify
+from rest_framework.exceptions import ValidationError
 from . import models
 
 
@@ -36,9 +38,10 @@ class ProductDetailSerializer(serializers.ModelSerializer):
 class ProductListSerializer(serializers.ModelSerializer):
     category_title = serializers.CharField(source='category.title', read_only=True)
     price = serializers.SerializerMethodField()
+    url = serializers.HyperlinkedIdentityField(view_name='product-detail',lookup_field='pk')
     class Meta:
         model = models.Product
-        fields = ['title','description','category_title','price']
+        fields = ['title','description','category_title','price','url']
         read_only_fields = ['slug']
         
     def create(self, validated_data):
@@ -80,26 +83,35 @@ class CartItemCreateSerializer(serializers.ModelSerializer):
         fields = ['cart','product_variant','quantity',]
     
     def create(self, validated_data):
-        try:
-            cart = validated_data['cart']
-            product_variant = validated_data['product_variant']
-            obj = models.CartItem.objects.get(cart=cart,product_variant=product_variant)
-            if obj:
-                obj.quantity += validated_data['quantity']
-                obj.save()
-                return obj
-        except:
+        quantity = validated_data['quantity']
+        product_variant = validated_data['product_variant']
+        if quantity>product_variant.inventory:
+            raise ValidationError('storage to low')
+        else:
             
-            return super().create(validated_data)
+            try:
+                cart = validated_data['cart']
+                product_variant = validated_data['product_variant']
+                obj = models.CartItem.objects.get(cart=cart,product_variant=product_variant)
+                if obj:
+                    obj.quantity += validated_data['quantity']
+                    obj.save()
+                    return obj
+            except:
+            
+                return super().create(validated_data)
 
 class CartItemSerializer(serializers.ModelSerializer):
     product_variant = ProductVariantSerializer()
     title = serializers.CharField(source='product_variant.product.title')
     cart = serializers.UUIDField(source='cart.uuid')
     
+    
     class Meta:
         model = models.CartItem
         fields = ['cart','title','product_variant','quantity','total_price']
+        
+        
         
 class CartItemUpdateSerializer(serializers.ModelSerializer):
     class Meta:

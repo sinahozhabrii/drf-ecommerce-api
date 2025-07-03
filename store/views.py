@@ -143,8 +143,11 @@ class CartItemIncrementView(APIView):
             
     def patch(self,*args, **kwargs):
         obj = get_object_or_404(models.CartItem,pk=kwargs.get('pk'),cart__uuid=kwargs.get('uuid'))
-        obj.quantity +=1
-        obj.save()
+        if obj.quantity<obj.product_variant.inventory:
+            obj.quantity +=1
+            obj.save()
+        else:
+            return Response({'error':'you can not buy this amount of this item'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'quantity': obj.quantity}, status=status.HTTP_200_OK)
     
 class CartItemDecrementView(APIView):
