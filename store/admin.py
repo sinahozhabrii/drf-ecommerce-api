@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.db.models.query import QuerySet
 from django.http import HttpRequest
+from django.utils.html import format_html
 from . import models
+from helpers import get_cloudinary_image_obj
 # Register your models here.
 admin.site.register(models.Customer)
 admin.site.register(models.Address)
@@ -29,10 +31,16 @@ class CartItemInline(admin.StackedInline):
 @admin.register(models.Product)
 class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductVariantInline]
+    readonly_fields = ['display_image']
     prepopulated_fields = {'slug':['title']}
     list_select_related = ['category']
     def get_queryset(self, request: HttpRequest) -> QuerySet:
         return super().get_queryset(request).prefetch_related('variants','variants__discount','variants__attribute__attribute')
+    
+    def display_image(self,obj):
+        url = get_cloudinary_image_obj(obj)
+        
+        return format_html(f"<image src={url} />")
 @admin.register(models.Cart)    
 class CartAdmin(admin.ModelAdmin):
     inlines = [CartItemInline]
@@ -40,8 +48,14 @@ class CartAdmin(admin.ModelAdmin):
 @admin.register(models.Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['title','description','slug','product_num']
+    readonly_fields = ['display_image']
     prepopulated_fields = {'slug':['title']}
     
     def product_num(self,category):
         
         return category.products.all().count()
+    
+    def display_image(self,obj):
+        url = get_cloudinary_image_obj(obj)
+        
+        return format_html(f"<image src={url} />")

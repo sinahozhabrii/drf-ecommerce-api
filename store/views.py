@@ -1,6 +1,7 @@
 import re
 from django.shortcuts import get_object_or_404, render
 from rest_framework import generics , mixins,filters
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework import status
@@ -19,6 +20,7 @@ class ProductListCreateView(generics.ListCreateAPIView):
     permission_classes = [DjangoModelPermissions]
     filter_backends = [DjangoFilterBackend,filters.SearchFilter,filters.OrderingFilter]
     filterset_class = filter.ProductFilter
+    parser_classes = [MultiPartParser, FormParser]
     
     search_fields = ['title', 'description']
     ordering_fields = ['price', 'created_at']
@@ -166,6 +168,7 @@ class CustomerView(mixins.UpdateModelMixin,mixins.DestroyModelMixin,mixins.ListM
     queryset = models.Customer.objects.all()
     serializer_class = serializers.CustomerSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
     
     def get(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)

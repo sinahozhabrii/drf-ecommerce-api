@@ -1,9 +1,56 @@
 import uuid
 from django.db import models
 from django.contrib.auth import get_user_model
+from helpers import cloudinary_init
+from cloudinary.models import CloudinaryField
+
+cloudinary_init()
+
+
+def get_public_id_prefix(obj):
+    if hasattr(obj,'title'):
+        if hasattr(obj,'category'):
+            return f'{obj.slug}-{obj.category}'
+        else:
+            return f'{obj.slug}'
+    elif hasattr(obj,'proudct'):
+        return f'{obj.product.slug}-{obj.product.category}-{obj.attribute}'
+    
+    elif hasattr(obj,'user'):
+        return f'{obj.user.username}-profile_upload'
+    obj_class = obj.__class__
+    obj_class_name = obj_class.__name__
+    
+    return f'{obj_class_name}-upload'
+
+def get_display_name(obj):
+    if hasattr(obj,'title'):
+        if hasattr(obj,'category'):
+            return f'{obj.slug}-{obj.category}'
+        else:
+            return f'{obj.slug}'
+    elif hasattr(obj,'proudct'):
+        return f'{obj.product.slug}-{obj.product.category}-{obj.attribute}'
+    
+    elif hasattr(obj,'user'):
+        return f'{obj.user.username}-profile_upload'
+    
+    obj_class = obj.__class__
+    obj_class_name = obj_class.__name__
+    
+    return f'{obj_class_name}-upload'
 # Create your models here.
 class Customer(models.Model):
     user = models.ForeignKey(get_user_model(),on_delete=models.CASCADE)
+    profile_image = CloudinaryField(
+                            'image',blank=True,null=True,
+                            
+                            public_id_prefix=get_public_id_prefix,
+                            
+                            display_name = get_display_name,
+                            
+                            tags = ['product']
+                            )
     phone_number = models.CharField(max_length=11,blank=True,null=True)
     age = models.DateField(blank=True,null=True)
     
@@ -20,9 +67,19 @@ class Address(models.Model):
     city = models.CharField(max_length=100)
     address = models.TextField()
     
+        
 class Product(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=False,null=True)
+    image = CloudinaryField(
+                            'image',blank=True,null=True,
+                            
+                            public_id_prefix=get_public_id_prefix,
+                            
+                            display_name = get_display_name,
+                            
+                            tags = ['product']
+                            )
     category = models.ForeignKey("Category", on_delete=models.SET_NULL,null=True,related_name='products')
     slug = models.SlugField()
     datetime_created = models.DateTimeField(auto_now_add=True)
@@ -47,6 +104,15 @@ class comments(models.Model):
     
 class Category(models.Model):
     title = models.CharField(max_length=255)
+    image = CloudinaryField(
+                            'image',blank=True,null=True,
+                            
+                            public_id_prefix=get_public_id_prefix,
+                            
+                            display_name = get_display_name,
+                            
+                            tags = ['product']
+                            )
     slug = models.SlugField()
     description = models.TextField(null=True,blank=True)
     
@@ -75,6 +141,15 @@ class AttributeValue(models.Model):
     
 class ProductVariant(models.Model):
     product = models.ForeignKey(Product,models.PROTECT,related_name='variants')
+    image = CloudinaryField(
+                            'image',blank=True,null=True,
+                            
+                            public_id_prefix=get_public_id_prefix,
+                            
+                            display_name = get_display_name,
+                            
+                            tags = ['product']
+                            )
     attribute = models.ManyToManyField(AttributeValue)
     inventory = models.PositiveSmallIntegerField(default=0)
     price = models.DecimalField(max_digits=10,decimal_places=2)

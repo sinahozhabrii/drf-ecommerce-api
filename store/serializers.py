@@ -39,9 +39,10 @@ class ProductListSerializer(serializers.ModelSerializer):
     category_title = serializers.CharField(source='category.title', read_only=True)
     price = serializers.SerializerMethodField()
     url = serializers.HyperlinkedIdentityField(view_name='product-detail',lookup_field='pk')
+    image = serializers.ImageField()
     class Meta:
         model = models.Product
-        fields = ['title','description','category_title','price','url']
+        fields = ['title','image','description','category_title','price','url']
         read_only_fields = ['slug']
         
     def create(self, validated_data):
@@ -179,8 +180,10 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 class CustomerSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source = 'user.username')
     email = serializers.EmailField(source = 'user.email')
+    profile_image = serializers.ImageField()
+    
     class Meta:
         model = models.Customer
-        fields = ['username','email','phone_number','age']
+        fields = ['username','email','profile_image','phone_number','age']
         
     
