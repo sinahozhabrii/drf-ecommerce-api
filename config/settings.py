@@ -91,7 +91,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 database_url = config('DATABASE_URL', default='')
 if type(database_url) == str:
     DATABASES = {
-        'default': dj_database_url.config(default=database_url)
+        'default': dj_database_url.parse(database_url)
         }
 
 
