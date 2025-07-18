@@ -88,9 +88,9 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-database_url = config('DATABASE_URL', default='')
-if type(database_url) == str:
-    DATABASES = {
+
+database_url = config('DATABASE_URL',default='')
+DATABASES = {
         'default': dj_database_url.parse(database_url)
         }
 
