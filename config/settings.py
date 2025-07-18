@@ -28,6 +28,8 @@ SECRET_KEY = config('SECRET_KEY',default=False,)
 DEBUG = config('DEBUG',default=False,cast=bool)
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = ['https://drf-ecommerce-api-new.up.railway.app/']
+
 
 
 # Application definition
